@@ -27,36 +27,40 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     NetworkUtils urlTest = new NetworkUtils();
-    private TextView txtviews;
     private RecyclerView recviews;
     private ArrayList<String> aTitle = new ArrayList<>();
     private ArrayList<String> aDescription = new ArrayList<>();
     private ArrayList<String> aDate = new ArrayList<>();
+    private ArrayList<String> aURL = new ArrayList<>();
+    private JSONObject news = new JSONObject();
+    private JsonUtils arts = new JsonUtils();
+    private  ArrayList<NewsItem> newsarray = new ArrayList<>();
     String urlText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.news_item);
-        txtviews = findViewById(R.id.textView);
-
+        setContentView(R.layout.activity_main);
         NewsQueryTask viewing = new NewsQueryTask();
         viewing.execute();
-      //  insertJSON();
         insertinfo();
     }
 
     private void insertinfo()
     {
-        aTitle.add("testing");
-        aDescription.add("d testing");
-        aDate.add("da testing");
+        for(int i = 0; i < newsarray.size(); i++)
+        {
+            aTitle.add(newsarray.get(i).getTitle());
+            aDescription.add(newsarray.get(i).getDescription());
+            aDate.add(newsarray.get(i).get_published());
+            aURL.add(newsarray.get(i).getUrl());
+        }
 
         recyclercall();
     }
 
     public void recyclercall(){
         recviews = (RecyclerView) findViewById(R.id.news_recyclerview);
-        NewsRecyclerViewAdapter news_adp = new NewsRecyclerViewAdapter(aTitle, aDescription, aDate,this);
+        NewsRecyclerViewAdapter news_adp = new NewsRecyclerViewAdapter(aTitle, aDescription, aDate, aURL,this);
         recviews.setAdapter(news_adp);
         recviews.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -67,16 +71,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                txtviews.setText("loading...");
                 urlText= NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildURL());
-                JSONObject news = new JSONObject();
-                news = new JSONObject(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildURL()));
-                JsonUtils arts = new JsonUtils();
-                ArrayList<NewsItem> newsarray = new ArrayList<>();
-                newsarray =arts.parseNews(news);
-                Log.e("url things",urlText);
-                Log.e("testing",newsarray.get(0).get_Aurthor());
-
+                insertJSON();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -85,8 +81,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            txtviews.setText(urlText);
-
 
         }
 
@@ -97,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
         int itemThatWasClickedId = news.getItemId();
         if (itemThatWasClickedId == R.id.action_search) {
             NewsQueryTask refresh = new NewsQueryTask();
+            insertinfo();
             refresh.execute();
-           // insertJSON();
             return true;
         }
         return super.onOptionsItemSelected(news);
@@ -109,7 +103,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    public void insertJSON()
+    {
+        try {
+            news = new JSONObject(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildURL()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        newsarray =arts.parseNews(news.toString());
+    }
 
 
 }

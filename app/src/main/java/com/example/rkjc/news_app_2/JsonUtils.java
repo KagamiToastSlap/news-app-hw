@@ -9,10 +9,11 @@ import org.json.JSONPointerException;
 import java.util.ArrayList;
 
 public class JsonUtils {
-    public static ArrayList<NewsItem> parseNews(JSONObject jobject) {
+    public static ArrayList<NewsItem> parseNews(String JSONString) {
         ArrayList<NewsItem> arr = new ArrayList<>();
         try
         {
+            JSONObject jobject = new JSONObject(JSONString);
             JSONArray articlesArray = jobject.getJSONArray("articles");
             for(int i = 0; i < articlesArray.length(); i++)
             {

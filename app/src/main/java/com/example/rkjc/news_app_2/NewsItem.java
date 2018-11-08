@@ -24,17 +24,17 @@ public class NewsItem {
         return aurthor;
     }
 
-    public String get_Title()
+    public String getTitle()
     {
         return title;
     }
 
-    public String get_news_Descriptions()
+    public String getDescription()
     {
         return news_Descriptions;
     }
 
-    public String get_theurl()
+    public String getUrl()
     {
         return theurl;
     }
